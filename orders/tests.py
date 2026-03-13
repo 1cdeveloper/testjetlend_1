@@ -62,7 +62,7 @@ class OrderCreateAPITests(TestCase):
         self.assertEqual(response.data["final_amount"], "900.00")
 
     def test_discount_rounding_half_up(self):
-        # 10% от 100.05 = 10.005 -> 10.01 (ROUND_HALF_UP)
+        # 10% от 100.05 = 10.005 -> 10.01 
         promo = self._create_promo(code="ROUND", discount_percent=10)
         payload = {"user_id": self.user.id, "amount": "100.05", "promo_code": promo.code}
 
@@ -138,7 +138,7 @@ class OrderCreateAPITests(TestCase):
             response = self.client.post(self.url, data=payload, format="json")
             self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
-        # третья попытка должна упасть по лимиту
+        #третья попытка должна упасть по лимиту
         third_user = User.objects.create_user(username="user3", password="testpass")
         payload = {"user_id": third_user.id, "amount": "200.00", "promo_code": promo.code}
         response = self.client.post(self.url, data=payload, format="json")
@@ -148,13 +148,13 @@ class OrderCreateAPITests(TestCase):
         self.assertEqual(Order.objects.filter(promo_code=promo).count(), 2)
 
     def test_missing_required_fields(self):
-        # отсутствует amount
+        #отсутствует amount
         payload = {"user_id": self.user.id}
         response = self.client.post(self.url, data=payload, format="json")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn("amount", response.data)
 
-        # отсутствует user_id
+        #отсутствует user_id
         payload = {"amount": "100.00"}
         response = self.client.post(self.url, data=payload, format="json")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
